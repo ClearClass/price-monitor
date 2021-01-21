@@ -37,7 +37,7 @@ public class OnlineCatalog {
 		Map<Product, Double> prods = new LinkedHashMap<>(30*n);
 		try {
 			List<Future<Map<Product, Double>>> pageTasks = new ArrayList<>(n);
-			for (Integer i=m; i<=m+n-1; i++)
+			for (int i=m; i<=m+n-1; i++)
 				pageTasks.add(es.submit(new GetPageTask(cat, i)));
 	
 			for (Future<Map<Product, Double>> pageTask : pageTasks)

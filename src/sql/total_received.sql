@@ -1,1 +1,0 @@
-SELECT date, COUNT(date) AS received FROM prices GROUP BY date ORDER BY date;

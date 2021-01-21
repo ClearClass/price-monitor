@@ -24,7 +24,17 @@ class GetPageTask implements Callable<Map<Product, Double>>{
 	@Override
 	public Map<Product, Double> call() throws Exception {
 		String url = OnlineCatalog.url;
-		Document page = Jsoup.connect(url + cat).data("page", n.toString()).get();
+		Document page = null;
+		for (int i = 1; i <= 5; i++) // 5 попыток
+			try {
+				page = Jsoup.connect(url + cat).data("page", n.toString()).get();
+				break;
+			} catch (Exception e) {
+				System.err.println("ошибка соединения: " + i + "; page=" + n);
+				if(i==5) 
+					throw new RuntimeException("ошибка url: " + page.baseUri());
+			}
+		
 		Elements prods = page.select("div.xf-product.js-product");
 		Map<Product, Double> prodsMap = new HashMap<>(30);
 		

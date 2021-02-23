@@ -4,7 +4,7 @@
 
    <groupId>in.clearclass</groupId>
    <artifactId>price-monitor</artifactId>
-   <version>1.0</version>
+   <version>1.2</version>
 
    <properties>
       <spring.version>4.1.4.RELEASE</spring.version>

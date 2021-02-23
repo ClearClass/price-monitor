@@ -1,5 +1,7 @@
 package in.clearclass.catalog;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -10,6 +12,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import in.clearclass.entity.Product;
+import static in.clearclass.catalog.OnlineCatalog.baseUrl;
 
 // ... задача получения одной страницы
 class GetPageTask implements Callable<Map<Product, Double>>{
@@ -23,11 +26,12 @@ class GetPageTask implements Callable<Map<Product, Double>>{
 	
 	@Override
 	public Map<Product, Double> call() throws Exception {
-		String url = OnlineCatalog.url;
 		Document page = null;
 		for (int i = 1; i <= 5; i++) // 5 попыток
 			try {
-				page = Jsoup.connect(url + cat).data("page", n.toString()).get();
+				URL url = new URL(baseUrl + cat + "?page=" + n);
+				HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+				page = Jsoup.parse(conn.getInputStream(), "UTF-8", "");
 				break;
 			} catch (Exception e) {
 				System.err.println("ошибка соединения: " + i + "; page=" + n);

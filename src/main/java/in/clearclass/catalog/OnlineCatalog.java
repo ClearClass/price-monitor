@@ -16,12 +16,12 @@ import in.clearclass.Main;
 import in.clearclass.entity.Product;
 
 public class OnlineCatalog {
-	static final String url = "https://www.perekrestok.ru/catalog/";
+	static final String baseUrl = "https://www.vprok.ru/catalog";
 	private static final ExecutorService es = Executors.newFixedThreadPool(Main.N);
 		
 	public static int numOfPages(String cat) {
 		try {
-			Document page = Jsoup.connect(url + cat).data("page", "2").get();
+			Document page = Jsoup.connect(baseUrl + cat).data("page", "2").get();
 			String st = page.select("[name=description]").first().attr("content");
 			return Integer.parseInt(st.substring(st.indexOf("Страница 2 из")+14).replace(".", ""));
 		} catch (IOException e) {
@@ -50,7 +50,7 @@ public class OnlineCatalog {
 		return prods;
 	}
 	
-	public static void shutdown(){
+	public static void shutdownThreads(){
 		es.shutdown();
 	}
 }

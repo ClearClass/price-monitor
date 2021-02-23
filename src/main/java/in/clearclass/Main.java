@@ -1,7 +1,9 @@
 package in.clearclass;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import in.clearclass.catalog.OnlineCatalog;
 import in.clearclass.dao.ProductDAO;
@@ -13,17 +15,19 @@ public class Main{
 	public static void main(String[] args) {
 
 		// список категорий как часть url
-		String[] cats = {"ovoschi-frukty-griby",
-						 "ryba-i-moreprodukty",
-						 "myaso-ptitsa-delikatesy",
-						 "moloko-syr-yaytsa",
-						 "soki-vody-napitki",
-						 "kofe-chay-sahar",
-						 "konservy-orehi-sousy",
-						 "hleb-sladosti-sneki",
-						 "makarony-krupy-spetsii",
-						 "krasota-gigiena-bytovaya-himiya",
-						 "bytovaya-himiya-i-hoztovary"};
+		Map<Integer, String> cats = new LinkedHashMap<>();
+		cats.put(0,  "/1301/ovoschi-frukty-griby");
+		cats.put(1,  "/1304/ryba-i-moreprodukty");
+		cats.put(2,  "/1307/myaso-ptitsa-delikatesy");
+		cats.put(3,  "/1303/moloko-syr-yaytsa");
+		cats.put(4,  "/1312/soki-vody-napitki");
+		cats.put(5,  "/1302/kofe-chay-sahar");
+		cats.put(6,  "/1310/konservy-orehi-sousy");
+		cats.put(7,  "/1309/hleb-sladosti-sneki");
+		cats.put(8,  "/1300/makarony-krupy-spetsii");
+		cats.put(9,  "/1306/krasota-gigiena-bytovaya-himiya");
+		cats.put(10, "/2348/bytovaya-himiya-i-hoztovary");
+		cats.put(11, "/4019/sladosti-i-sneki"); // merges with cat.7 in dao
 		
 		// dao для записи в БД
 		ProductDAO dao = ProductDAOImpl.getInst();
@@ -31,23 +35,27 @@ public class Main{
 		// перечень продуктов и их цен, которые уже были отправлены в БД
 		Map<Product, Double> saved = new HashMap<>();
 		
-		for (int i=0; i<cats.length; i++) {
-			int num = OnlineCatalog.numOfPages(cats[i]);
+		for (Entry<Integer, String> cat : cats.entrySet()) { // по всем категориям ..
+			int num = OnlineCatalog.numOfPages(cat.getValue());
 			int n = num/N;
 			int m = num%N;
 			for (int j = 0; j < n; j++){
-				System.out.println("cat: " + i + ", getting pages: " + (1+N*j) + "-" + N*(j+1) + " of " + num);
-				Map<Product, Double> prods = OnlineCatalog.getPages(cats[i], 1+N*j, N);
+				System.out.println("cat: " + cat.getKey() + ", getting pages: " + (1+N*j) + "-" + N*(j+1) + " of " + num);
+				Map<Product, Double> prods = OnlineCatalog.getPages(cat.getValue(), 1+N*j, N);
 				prods.keySet().removeAll(saved.keySet());
-				dao.save(prods, i);
+				dao.save(prods, cat.getKey());
 				saved.putAll(prods);
 			}
-			System.out.println("cat: " + i + ", getting pages: " + (1+N*n) + "-" + (N*n+m) + " of " + num);
-			Map<Product, Double> prods = OnlineCatalog.getPages(cats[i], 1+N*n, m);
-			prods.keySet().removeAll(saved.keySet());
-			dao.save(prods, i);
-			saved.putAll(prods);
+			
+			if(m!=0){ // остаток
+				System.out.println("cat: " + cat.getKey() + ", getting pages: " + (1+N*n) + "-" + (N*n+m) + " of " + num);
+				Map<Product, Double> prods = OnlineCatalog.getPages(cat.getValue(), 1+N*n, m);
+				prods.keySet().removeAll(saved.keySet());
+				dao.save(prods, cat.getKey());
+				saved.putAll(prods);
+			}
 		}
-		OnlineCatalog.shutdown();
+		
+		OnlineCatalog.shutdownThreads();
 	}
 }

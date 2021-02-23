@@ -34,14 +34,15 @@ public class ProductDAOImpl implements ProductDAO {
 	}
 
 	@Override
-	public void save(Map<Product, Double> prods, Integer cat) {
+	public void save(Map<Product, Double> prods, int cat) {
 		txTemplate.execute(status->{
 			String query = "INSERT INTO prices VALUES(?,?,?)";
 			List<Object[]> queryData = new ArrayList<>();
 			for (Map.Entry<Product, Double> entryProd : prods.entrySet()) {
 				Product prod = entryProd.getKey();
 				Double price = entryProd.getValue();
-				int prod_id = jdbcTemplate.queryForObject("SELECT sel_ins(?, ?, ?)", Integer.class, prod.getPartnum(), prod.getName(), cat);
+				int prod_id = jdbcTemplate.queryForObject("SELECT sel_ins(?, ?, ?)", Integer.class, 
+						prod.getPartnum(), prod.getName(), (cat==11)? 7 : cat);
 				queryData.add(new Object[]{Date.valueOf(LocalDate.now()), prod_id, price});
 			}
 			jdbcTemplate.batchUpdate(query, queryData);

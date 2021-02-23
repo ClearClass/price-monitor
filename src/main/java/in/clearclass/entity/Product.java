@@ -32,14 +32,14 @@ public class Product {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
+	public boolean equals(Object ob) {
+		if (this == ob)
 			return true;
-		if (obj == null)
+		if (ob == null)
 			return false;
-		if (getClass() != obj.getClass())
+		if (getClass() != ob.getClass())
 			return false;
-		Product other = (Product) obj;
+		Product other = (Product) ob;
 		if (name == null) {
 			if (other.name != null)
 				return false;
